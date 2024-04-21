@@ -83,8 +83,6 @@ export const isWalletConnected = async () => {
   }
 }
 
-export const isUPinstalled = () => PROVIDER && PROVIDER.isUniversalProfileExtension
-
 export function AuthProvider({ children }) {
   const [wallet, setWallet] = useState(null)
   const [profile, setProfile] = useState(null)
@@ -107,7 +105,7 @@ export function AuthProvider({ children }) {
       accounts = await web3.eth.getAccounts()
       //console.log(accounts)
       setWallet(accounts[0])
-      fetchProfile(accounts[0]).then((res) => setProfile(res))
+      //fetchProfile(accounts[0]).then((res) => setProfile(res))
       toast.dismiss(loadingToast)
       toast.success(`UP successfuly connected`)
       navigate(`/`)
@@ -119,21 +117,20 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    if (isUPinstalled()) {
+
       isWalletConnected().then((addr) => {
         if (addr !== undefined) {
           setWallet(addr)
-          fetchProfile(addr).then((res) => setProfile(res))
+          //fetchProfile(addr).then((res) => setProfile(res))
         }
       })
-    }
+
   }, [])
 
   const value = {
     wallet,
     setWallet,
     profile,
-    isUPinstalled,
     fetchProfile,
     setProfile,
     isWalletConnected,

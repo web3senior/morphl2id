@@ -10,6 +10,8 @@ import Yummy from './../../src/assets/yummy.svg'
 import FivePercent from './../../src/assets/5percent.svg'
 import BannerPartyIcon from './../../src/assets/banner-party-icon.svg'
 import Banner from './../../src/assets/banner.png'
+import KoalaPolygonal from './../../src/assets/koala-polygonal.png'
+import BlockchainShield from './../../src/assets/blockchain-shield.svg'
 import Web3 from 'web3'
 import ABI from './../abi/morphl2id.json'
 import party from 'party-js'
@@ -30,6 +32,9 @@ function Home({ title }) {
 
   const [recordTypeTotal, setRecordTypeTotal] = useState()
   const [resolveTotal, setResolveTotal] = useState()
+  const [recordTypeList, setRecordTypeList] = useState()
+  const [availableName, setAvailableName] = useState()
+  const [registeredName, setRegisteredName] = useState()
 
   const [totalSupply, setTotalSupply] = useState(0)
   const [holderReward, setHolderReward] = useState(0)
@@ -55,7 +60,7 @@ function Home({ title }) {
         .send()
         .then((res) => {
           console.log(res)
-          toast.dismiss(t)
+          //toast.dismiss(toastId)
           toast.success(`You hav been added to the list.`)
           party.confetti(document.querySelector(`h4`), {
             count: party.variation.range(20, 40),
@@ -63,7 +68,7 @@ function Home({ title }) {
         })
     } catch (error) {
       console.error(error)
-      toast.dismiss(t)
+      //toast.dismiss(toastId)
     }
   }
 
@@ -81,7 +86,7 @@ function Home({ title }) {
         .send()
         .then((res) => {
           console.log(res)
-          toast.dismiss(t)
+          //toast.dismiss(toastId)
           toast.success(`You hav been added to the list.`)
           party.confetti(document.querySelector(`h4`), {
             count: party.variation.range(20, 40),
@@ -89,7 +94,7 @@ function Home({ title }) {
         })
     } catch (error) {
       console.error(error)
-      toast.dismiss(t)
+      //toast.dismiss(toastId)
     }
   }
 
@@ -144,12 +149,6 @@ function Home({ title }) {
     return false
   }
 
-  const getLike = async (appId) => {
-    let web3 = new Web3(import.meta.env.VITE_RPC_URL)
-    const UpstoreContract = new web3.eth.Contract(ABI, import.meta.env.VITE_UPSTORE_CONTRACT_MAINNET)
-    return await UpstoreContract.methods.getLikeTotal(appId).call()
-  }
-
   const handleRemoveRecentApp = async (e, appId) => {
     localStorage.setItem('appSeen', JSON.stringify(recentApp.filter((reduceItem) => reduceItem.appId !== appId)))
 
@@ -160,18 +159,33 @@ function Home({ title }) {
   }
 
   const getRecordTypeTotal = async () => await Morphl2Contract.methods._recordTypeCounter().call()
+
+  const getRecordTypeList = async () => await Morphl2Contract.methods.getRecordTypeList().call()
+
   const getResolveTotal = async () => await Morphl2Contract.methods._resolveCounter().call()
-  const handleMint = async (e) => {
-    if (!price) {
-      toast.error(`Can't read the mint price`)
-      return false
+
+  const isFreeToRegister = async (e) => {
+    e.preventDefault()
+
+    if (availableName) {
+      handleBuy(e)
+      return
     }
-    const t = toast.loading(`Waiting for transaction's confirmation`)
-    e.target.innerText = `Waiting...`
-    if (typeof window.lukso === 'undefined') window.open('https://chromewebstore.google.com/detail/universal-profiles/abpickdkkbnbcoepogfhkhennhfhehfn?hl=en-US&utm_source=candyzap.com', '_blank')
+
+    let formData = new FormData(e.target)
+    let address = formData.get(`address`)
+    let recordType = formData.get(`recordType`)
+    let recordTypeInfo = await Morphl2Contract.methods.getRecordType(recordType).call()
+
+    address = web3.utils.keccak256(web3.utils.toHex(web3.utils.toHex(`${address}.${recordTypeInfo.name}`)))
+
+    document.querySelector(`#btnRegister`).innerText = `Waiting...`
+    document.querySelector(`#btnRegister`).disabled = true
+
+    if (typeof window.ethereum === 'undefined') window.open('https://chromewebstore.google.com/', '_blank')
 
     try {
-      window.lukso
+      window.ethereum
         .request({ method: 'eth_requestAccounts' })
         .then((accounts) => {
           const account = accounts[0]
@@ -180,35 +194,35 @@ function Home({ title }) {
 
           web3.eth.defaultAccount = account
           Morphl2Contract.methods
-            .newMint()
-            .send({
-              from: account,
-              value: web3.utils.toWei(price, 'ether'),
-            })
+            .isFreeToRegister(address)
+            .call()
             .then((res) => {
-              setWinner(res.events.Rewarded.returnValues[0])
-              console.log('Winner:' + res.events.Rewarded.returnValues[0])
-              // Run partyjs
-              party.confetti(document.querySelector(`header`), {
-                count: party.variation.range(20, 40),
-                shapes: ['Vector0', 'Vector1', 'Vector2', 'Vector3', 'Vector4', 'Vector5', 'Vector6', 'Vector7'],
-              })
+              console.log(res)
+              document.querySelector(`#btnRegister`).innerText = `Confirm`
+              document.querySelector(`#btnRegister`).disabled = false
 
-              e.target.innerText = `Mint`
-              toast.dismiss(t)
+              document.querySelector(`.registerResult`).innerText = res ? `🎉Congratulations!! the domain is available to register.` : `⛔Please try another name`
+
+              if (res) {
+                party.confetti(document.querySelector(`.registerResult`), {
+                  count: party.variation.range(20, 40),
+                })
+              }
+
+              setAvailableName(address)
             })
             .catch((error) => {
-              e.target.innerText = `Mint`
-              toast.dismiss(t)
+              document.querySelector(`#btnRegister`).innerText = `Register`
+              document.querySelector(`#btnRegister`).disabled = false
             })
           // Stop loader when connected
           //connectButton.classList.remove("loadingButton");
         })
         .catch((error) => {
-          e.target.innerText = `Mint`
+          document.querySelector(`#btnRegister`).innerText = `Register`
           // Handle error
           console.log(error, error.code)
-          toast.dismiss(t)
+
           // Stop loader if error occured
 
           // 4001 - The request was rejected by the user
@@ -217,12 +231,90 @@ function Home({ title }) {
         })
     } catch (error) {
       console.log(error)
-      toast.dismiss(t)
-      e.target.innerText = `Mint`
+
+      document.querySelector(`#btnRegister`).innerText = `Register`
+    }
+  }
+
+  const handleBuy = async (e) => {
+    if (!availableName) return
+
+    // const toastId = toast.loading(`Waiting for transaction's confirmation`)
+
+    let formData = new FormData(e.target)
+    let address = formData.get(`address`)
+    let recordType = formData.get(`recordType`)
+    let recordTypeInfo = await Morphl2Contract.methods.getRecordType(recordType).call()
+
+    document.querySelector(`#btnRegister`).innerText = `Waiting...`
+    document.querySelector(`#btnRegister`).disabled = true
+
+    if (typeof window.ethereum === 'undefined') window.open('https://chromewebstore.google.com/', '_blank')
+
+    try {
+      window.ethereum
+        .request({ method: 'eth_requestAccounts' })
+        .then((accounts) => {
+          const account = accounts[0]
+          console.log(account)
+          // walletID.innerHTML = `Wallet connected: ${account}`;
+
+          web3.eth.defaultAccount = account
+          Morphl2Contract.methods
+            .register(address, recordTypeInfo.id)
+            .send({
+              from: account,
+              value: recordTypeInfo.price,
+            })
+            .then((res) => {
+              //toast.dismiss(toastId)
+              console.log(res)
+              document.querySelector(`#btnRegister`).innerText = `Register`
+              document.querySelector(`#btnRegister`).disabled = false
+
+              document.querySelector(`.registerResult`).innerHTML = `🎉 ${address}.${recordTypeInfo.name} has been registered for 360 days.`
+
+              party.confetti(document.querySelector(`.registerResult`), {
+                count: party.variation.range(20, 40),
+              })
+
+              setAvailableName()
+              setRegisteredName(`${address}.${recordTypeInfo.name}`)
+            })
+            .catch((error) => {
+              document.querySelector(`#btnRegister`).innerText = `Confirm`
+              document.querySelector(`#btnRegister`).disabled = false
+              //toast.dismiss(toastId)
+            })
+          // Stop loader when connected
+          //connectButton.classList.remove("loadingButton");
+        })
+        .catch((error) => {
+          //toast.dismiss(toastId)
+          document.querySelector(`#btnRegister`).innerText = `Confirm`
+          // Handle error
+          console.log(error, error.code)
+
+          // Stop loader if error occured
+
+          // 4001 - The request was rejected by the user
+          // -32602 - The parameters were invalid
+          // -32603- Internal error
+        })
+    } catch (error) {
+      console.log(error)
+      //toast.dismiss(toastId)
+      document.querySelector(`#btnRegister`).innerText = `Confirm`
     }
   }
 
   useEffect(() => {
+    getRecordTypeList().then(async (res) => {
+      console.log(res)
+      setRecordTypeList(res)
+      setIsLoading(false)
+    })
+
     getRecordTypeTotal().then(async (res) => {
       console.log(res)
       setRecordTypeTotal(web3.utils.toNumber(res))
@@ -239,13 +331,21 @@ function Home({ title }) {
     <>
       <section className={styles.section}>
         <div className={`__container`} data-width={`large`}>
-          <div className={`${styles['lips']} d-flex flex-column align-items-center justify-content-center ms-motion-slideDownIn`}>
-            <h3>
-              <b>Register Morph domain name</b>
-            </h3>
-            <p>Secure your digital presence by registering this domain now it's available for you</p>
+          <div className={`d-flex flex-column align-items-center justify-content-center ms-motion-slideDownIn`}>
+            <figure className={`${styles['koala']}`}>
+              <img src={KoalaPolygonal} />
+            </figure>
 
-            <div className={`${styles['domain-card']} card d-flex flex-column align-items-center justify-content-between`}>
+            <h1 className={`d-flex flex-column align-items-center justify-content-center`}>Register Morph Name</h1>
+            <p className={`${styles['note']} text-center`}>
+              Morph Naming Services (MNS) is decentralized, more secure, gives users ownership of their domains, and allows memorable names for easier transactions.
+            </p>
+
+            <div
+              className={`${styles['domain-card']} card d-flex flex-column align-items-center justify-content-between`}
+              onMouseOver={() => document.querySelector(`.${styles['koala']}`).classList.add(styles['koala-hover'])}
+              onMouseOut={() => document.querySelector(`.${styles['koala']}`).classList.remove(styles['koala-hover'])}
+            >
               <ul className={`d-flex flex-row align-items-center justify-content-between w-100`}>
                 <li>id-card</li>
                 <li>
@@ -253,17 +353,45 @@ function Home({ title }) {
                 </li>
               </ul>
 
-              <div className={styles['form-input']}>
-                <input type="text" name="atenyun.morph" id="" />
-              </div>
+              <form action="" className={`${styles['form-input']}`} onSubmit={(e) => isFreeToRegister(e)}>
+                <div className={` d-flex flex-column align-items-center justify-content-between`}>
+                  <input type="text" name="address" id="" maxLength={13} placeholder={`vitalik`} pattern={`^[a-z1-9\.]{3,13}`} autoComplete={`off`} required />
+                  <select name={`recordType`} className="mt-10">
+                    {!recordTypeList && <option>Reading...</option>}
+                    {recordTypeList &&
+                      recordTypeList.map((item, i) => (
+                        <option value={item.id} key={i}>
+                          🆔.{item.name} 💰 {web3.utils.fromWei(item.price, 'ether').toString()} $ETHM 📅 a year
+                        </option>
+                      ))}
+                  </select>
+                </div>
 
-              <p className={`${styles['copyright']}`}>
+                <small className={`registerResult mt-10 text-center`}></small>
+
+                {registeredName && (
+                  <Link to={registeredName} target={`_blank`}>
+                    {` View `}
+                  </Link>
+                )}
+
+                <div className={`d-flex flex-row align-items-center justify-content-between mt-40`} style={{ columnGap: `1.5rem` }}>
+                  <button type={`submit`} id={`btnRegister`}>
+                    Register
+                  </button>
+                </div>
+              </form>
+
+              <p className={`${styles['copyright']} mt-20`}>
+                <img src={BlockchainShield} />
+                <br />
+                <br />
                 Developed by{' '}
                 <Link to={`//aratta.dev`} target={`_blank`}>
                   Aratta Labs
                 </Link>
                 <br />
-                for Morph community
+                for the Morph community
               </p>
             </div>
           </div>
@@ -271,18 +399,8 @@ function Home({ title }) {
           <div className={`${styles['statistics']} grid grid--fit`} style={{ '--data-width': '124px' }}>
             <StatisticCard name={`record types`} total={recordTypeTotal} />
             <StatisticCard name={`names`} total={resolveTotal} />
-            <StatisticCard name={`sub domains`} total={resolveTotal} />
             <StatisticCard name={`DID`} total={resolveTotal} />
           </div>
-
-
-          <div className={`__container`} data-width={`small`}>
-          <h4>Morph Ecosystem Wallets</h4>
-            <div className={`card`}>
-              <div className={`card__body d-flex flex-column align-items-center justify-content-between`}>s</div>
-            </div>
-          </div>
-
         </div>
       </section>
     </>

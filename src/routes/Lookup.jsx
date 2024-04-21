@@ -88,9 +88,11 @@ function App({ title }) {
   useEffect(() => {
     let address = params.address.split('.')
     address = web3.utils.keccak256(web3.utils.toHex(web3.utils.toHex(`${address[0]}.${address[1]}`)))
+    console.log(address)
+
     getResolve(address).then((res) => {
       setMetadata(res)
-      fetchIPFS(`QmRcecs1PPAgnc1nPtve2hVyUUaUwX3k7FZiyHTyxTYfjw`).then((obj) => {
+      fetchIPFS(res.metadata).then((obj) => {
         console.log(obj)
         setData(obj)
         setIsLoading(false)
@@ -122,9 +124,8 @@ function App({ title }) {
                         <img alt={data.name} src={`https://ipfs.io/ipfs/${data.pfp}`} />
                         <figcaption>{data.name}</figcaption>
                       </figure>
-                      <span className={`badge badge-success`}>{params.address}</span>
+                      <span className={`btn`}>{params.address}</span>
 
-                      <button className="btn mt-20">Send $morph</button>
                       {/* <div className={`mt-10`}>
                         {app[0].tags &&
                           app[0].tags.split(',').map((tag, i) => (
@@ -143,16 +144,38 @@ function App({ title }) {
                   <>
                     <div className={`${styles['wallet']} card grid grid--fit`} style={{ '--data-width': '400px' }}>
                       <div className={`card__header d-flex flex-row align-items-center justify-content-between`}>
-                        <span>Wallet Addresses</span>
+                        <span>Main Domain [{params.address}]</span>
                       </div>
                       <div className={`card__body `}>
                         {data.wallet &&
                           data.wallet.length > 0 &&
                           data.wallet[0].domain.map((item, i) => (
-                            <div className={` d-flex flex-row align-items-center justify-content-between`}>
+                            <div className={` d-flex flex-row align-items-center justify-content-between`} key={i}>
                               <label className="alert alert--light">{item.name} </label>
                               <span className="badge badge-primary">{item.addr}</span>
                             </div>
+                          ))}
+
+                      </div>
+                    </div>
+
+                    <div className={`${styles['wallet']} card grid grid--fit mt-40`} style={{ '--data-width': '400px' }}>
+                      <div className={`card__header d-flex flex-row align-items-center justify-content-between`}>
+                        <span>Sub Domain [NAME.{params.address}]</span>
+                      </div>
+                      <div className={`card__body `}>
+                        {data.wallet &&
+                          data.wallet.length > 0 &&
+                          data.wallet[0].subdomain.map((item, i) => (
+                            <details className="alert alert--light">
+                              <summary>{item.name}.{params.address}</summary>
+                              <div className={`d-flex flex-column align-items-center justify-content-between`}>
+                                {item.addresses.map(addressItem => <div  className={`d-flex flex-row align-items-center justify-content-between w-100 mt-20`}>
+                                  <div>{addressItem.name}</div>
+                                  <div>{addressItem.addr}</div>
+                                </div>)}
+                              </div>
+                            </details>
                           ))}
                       </div>
                     </div>
@@ -173,8 +196,8 @@ function App({ title }) {
                     <div className={`${styles['links']} grid grid--fit`} style={{ '--data-width': '124px' }}>
                       {data.links &&
                         data.links.length > 0 &&
-                        data.links.map((item) => (
-                          <a href={`${item.url}`} target={`_blank`}>
+                        data.links.map((item, i) => (
+                          <a href={`${item.url}`} target={`_blank`} key={i}>
                             {item.name}
                           </a>
                         ))}

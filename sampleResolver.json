@@ -1,5 +1,5 @@
 {
-  "name": "Amir Rahimi",
+  "name": "Amir Rahimi 🐨",
   "description": "Consider dedicating 13 years of your life to perfecting your skills and expertise as a software engineer. 🤯 It's an incredible feat, and one that deserves to be recognized with immense pride. This statement highlights the effort and determination that goes into forging a career in technology. 🚀 As a confident observer, I can envision the unwavering effort and commitment required to reach such a milestone. It is undoubtedly a significant accomplishment that should be celebrated with great joy. 🎉",
   "pfp": "QmR6pZiLVMQ1rTNeaGenpSPAzPULePCP5q9FXd4zRteYRT",
   "links": [
@@ -30,7 +30,8 @@
       ],
       "subdomain": [
         {
-          "myteam.morph": [
+          "name": "myteam",
+          "addresses": [
             {
               "name": "morph",
               "addr": "0x20e229667Cec8A0e9D3C6Fb89693B2a44ec2C50e"
@@ -42,7 +43,8 @@
           ]
         },
         {
-          "family.morph": [
+          "name": "family",
+          "addresses": [
             {
               "name": "morph",
               "addr": "0x20e229667Cec8A0e9D3C6Fb89693B2a44ec2C50e"

@@ -13,7 +13,20 @@
     font-weight: bold;
     color: #088ae9;
   }
-
+  summary {
+    list-style-position: outside;
+    margin-left: 30px;
+    padding: 10px 10px 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  details[open] summary {border-radius: 5px 5px 0 0;}
+  
+  details {
+    background: #e4eaef;
+    border-radius: 5px;
+  }
   figure {
     text-align: center;
     figcaption {
@@ -140,7 +153,7 @@
 
 .wallet {
   label {
-    text-transform: capitalize;
+    text-transform: lowercase;
     font-weight: bold;
   }
 }

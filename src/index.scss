@@ -1,12 +1,10 @@
 :root {
-  font-family: 'Open Sans', system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  font-size: 13px;
+  font-family: var(--ff-default);
+  // line-height: 1.5;
 
   // color-scheme: light dark;
   // color: rgba(255, 255, 255, 0.87);
-  background: #FAFCFF;
+  background: var(--white);
   -webkit-tap-highlight-color: transparent;
 
   font-synthesis: none;

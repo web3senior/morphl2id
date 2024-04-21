@@ -8,62 +8,44 @@
   }
   padding-top: 2rem;
 
+  .koala {
+    img {
+      width: 8rem;
+      transition-property: box-shadow, filter;
+      transition-duration: 800ms;
+      transition-timing-function: cubic-bezier(0.16, 1, 0.29, 0.99);
+
+      &:hover {
+        -webkit-filter: brightness(130%);
+        filter: brightness(130%) drop-shadow(0 0 0.75rem var(--black-100));
+      }
+    }
+  }
+
+  .koala-hover {
+    img {
+      -webkit-filter: brightness(130%);
+      filter: brightness(130%);
+    }
+  }
+
+  h1 {
+    font-size: 2rem;
+    line-height: 1.5;
+  }
+
   a {
     font-weight: bold;
     color: #088ae9;
   }
 
-  .lips {
-    figure {
-      position: relative;
-    }
-
-    img {
-      margin: 0 auto;
-      width: auto;
-    }
-
-    svg {
-      position: absolute;
-      right: 0rem;
-      bottom: 3.7rem;
-    }
-
-    button.dice {
-      width: 52px;
-      height: 52px;
-      border-radius: 999px;
-      position: absolute;
-      right: -3rem;
-      bottom: -0.1rem;
-      background-color: #111111;
-      background-image: url('./../assets/dice.svg');
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 70%;
-      border: none;
-      outline: 3px solid rgba(0, 0, 0, 0.2);
-      transition: all ease-in-out 0.2s;
-      opacity: 0.8;
-      cursor: pointer;
-
-      &:hover {
-        opacity: 1;
-      }
-
-      &:active {
-        transform: rotate(-360deg) scale(0.9);
-      }
-    }
-  }
-
-  button.mint {
+  button {
     border: none;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
+    font-size: 1.1rem;
     background-color: #111111;
     color: var(--white);
     border-radius: 999px;
@@ -80,9 +62,7 @@
     }
 
     &[disabled] {
-      background-image: url('./../assets/wizard-btn-disabled.svg');
       opacity: 0.4;
-      color: #212121;
       cursor: not-allowed;
     }
   }
@@ -91,20 +71,29 @@
 .domain-card {
   position: relative;
   box-sizing: border-box;
-  padding: 3rem 4rem;
+  padding: 3rem 2rem 0 2rem;
   gap: 1rem;
   width: 450px;
-  isolation: isolate;
   color: #707070;
+  isolation: isolate;
+
+  &:hover {
+    .koala {
+      img {
+        -webkit-filter: brightness(130%);
+        filter: brightness(130%);
+      }
+    }
+  }
 
   &:before,
   &:after {
     position: absolute;
     left: 50%;
-    top: 40%;
+    top: 25%;
     transform: translate(-50%, -50%);
-    width: 14rem;
-    height: 14rem;
+    width: 11rem;
+    height: 11rem;
     border-radius: 999px;
     z-index: -1;
   }
@@ -129,7 +118,7 @@
 
   .form-input {
     position: relative;
-    margin-top: 18rem;
+    margin-top: 12rem;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -147,21 +136,56 @@
       z-index: -1;
     }
 
+    select {
+      display: block;
+      width: 100%;
+      height: 40px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      font-size: 1rem;
+      border: none;
+      margin: 0;
+
+      &:focus {
+        outline: none;
+      }
+    }
+
     input {
       all: unset;
-      border: 1px solid #242523;
+      border: 1px solid var(--color-borders-input);
       border-radius: 8px;
       font-size: 3rem;
-      padding: 2rem 1.5rem 1rem 1.5rem;
+      padding: 2rem 0 0 0;
       width: 100%;
       height: 100%;
       text-align: center;
+
+      &::placeholder {
+        color: var(--black);
+        opacity: 0.1;
+      }
+
+      &:hover {
+        border-color: var(--color-primary);
+      }
+
+      &:focus {
+        border-color: var(--color-primary);
+        box-shadow: inset 0 0 0 1px var(--color-primary);
+        caret-color: var(--color-primary);
+      }
     }
   }
 
   .copyright {
     text-align: center;
     line-height: 20px;
+    font-weight: 300;
+    a {
+      color: var(--black-400);
+    }
   }
 }
 
@@ -458,4 +482,12 @@
   justify-content: center;
   color: var(--white) !important;
   cursor: pointer;
+}
+
+.note {
+  font-size: 1rem;
+  margin-bottom: 3rem;
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+  max-width: 400px;
 }

@@ -27,8 +27,6 @@
       box-shadow: none;
     }
 
-
-
     a {
       color: #53565c;
       b {
@@ -70,7 +68,7 @@
       }
 
       &:hover {
-        filter: brightness(.8);
+        filter: brightness(0.8);
       }
     }
 
@@ -215,7 +213,9 @@
 .logo {
   figure {
     &:first-child {
-      width: 40px;
+      img {
+        width: 40px;
+      }
     }
   }
 }
