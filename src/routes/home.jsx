@@ -396,6 +396,12 @@ function Home({ title }) {
             </div>
           </div>
 
+          <div className={`text-center mt-40`}>
+            <Link className={``} style={{ textTransform: 'uppercase' }} to={`https://sepolia.etherscan.io/address/${import.meta.env.VITE_MORPHL2ID_CONTRACT_TESTNET}`} target={`_blank`}>
+              view contract
+            </Link>
+          </div>
+
           <div className={`${styles['statistics']} grid grid--fit`} style={{ '--data-width': '124px' }}>
             <StatisticCard name={`record types`} total={recordTypeTotal} />
             <StatisticCard name={`names`} total={resolveTotal} />
